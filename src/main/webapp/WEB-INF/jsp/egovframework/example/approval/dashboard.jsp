@@ -5,8 +5,12 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>메인 대시보드</title>
+	
 	<!-- 공통 스타일과 라이브러리 -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<!-- Font Awesome 아이콘 CSS 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+	
 	<style>
         body { padding-top: 70px; }
     </style>
@@ -23,7 +27,12 @@
 				<h1 class="mb-4">전자결재 시스템 대시보드</h1>
 			</div>
 		</div>
-
+		<div class="mt-3 text-center">
+			<a href="${pageContext.request.contextPath}/document/form.do"
+				class="btn btn-success btn-lg"> 
+				<i class="fas fa-plus"></i> 새 결재 문서 작성
+			</a>
+		</div>
 		<div class="row">
 			<div class="col-md-6">
 				<div class="card shadow-sm mb-4">
