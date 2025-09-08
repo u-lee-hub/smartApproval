@@ -1,5 +1,8 @@
 package egovframework.example.approval.web;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import egovframework.example.approval.service.ApprovalDocumentVO;
+import egovframework.example.approval.service.ApprovalLineVO;
 import egovframework.example.approval.service.ApprovalService;
 import egovframework.example.login.service.LoginVO;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +53,7 @@ public class ApprovalController {
     }
 	
 	/**
-	 * 결재 문서 작성 폼
+	 * 결재 문서 작성 폼 (결재선 지정 포함)
 	 * @param session
 	 * @param model
 	 * @return
@@ -61,11 +65,16 @@ public class ApprovalController {
         if (user == null) {
             return "redirect:/login.do";
         }
+        
+        // 같은 부서 사용자 목록 조회
+        List<LoginVO> deptUsers = approvalService.getUserListByDept(user.getDeptId());
+        model.addAttribute("deptUsers", deptUsers);
+
         return "/approval/documentForm";
     }
     
     /**
-     * 결재 문서 등록 처리
+     * 결재 문서 등록 처리 (결재선 포함)
      * @param request
      * @param session
      * @param model
@@ -82,7 +91,10 @@ public class ApprovalController {
         String title = request.getParameter("title");
         String content = request.getParameter("content");
         String documentType = request.getParameter("documentType");
+//        String approvalLinesJson = request.getParameter("approvalLines");
+        String[] approverIds = request.getParameterValues("approverIds");  //뷰에서 전송되는 데이터 배열로 받기 
         
+        // 문서 정보 설정 
         ApprovalDocumentVO document = new ApprovalDocumentVO();
         document.setTitle(title);
         document.setContent(content);
@@ -91,11 +103,34 @@ public class ApprovalController {
         document.setDeptId(user.getDeptId());
         
         try {
-            approvalService.insertDocument(document);
+        	// 결재선 정보 배열 처리 (뷰에서 HTML 배열 형태로 전송받아옴) 
+        	List<ApprovalLineVO> approvalLines = new ArrayList<>();
+            if (approverIds != null && approverIds.length > 0) {
+                for (int i = 0; i < approverIds.length; i++) {
+                    ApprovalLineVO line = new ApprovalLineVO();
+                    line.setApproverId(approverIds[i]);
+                    line.setApprovalOrder(i + 1);
+                    line.setApprovalType("APPROVAL");
+                    approvalLines.add(line);
+                }
+            }
+            
+            
+            
+            
+            // 문서와 결재선 함께 등록
+            approvalService.insertDocumentWithApprovalLines(document, approvalLines);
+            //approvalService.insertDocument(document);
+
             model.addAttribute("success", "결재 문서가 성공적으로 등록되었습니다.");
             return "redirect:/dashboard.do";
         } catch (Exception e) {
-            model.addAttribute("error", "문서 등록 중 오류가 발생했습니다.");
+            model.addAttribute("error", "문서 등록 중 오류가 발생했습니다." + e.getMessage());
+            
+            // 같은 부서 사용자 목록 다시 조회
+            List<LoginVO> deptUsers = approvalService.getUserListByDept(user.getDeptId());
+            model.addAttribute("deptUsers", deptUsers);
+            
             return "/approval/documentForm";
         }
     }
