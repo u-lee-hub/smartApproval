@@ -91,7 +91,6 @@ public class ApprovalController {
         String title = request.getParameter("title");
         String content = request.getParameter("content");
         String documentType = request.getParameter("documentType");
-//        String approvalLinesJson = request.getParameter("approvalLines");
         String[] approverIds = request.getParameterValues("approverIds");  //뷰에서 전송되는 데이터 배열로 받기 
         
         // 문서 정보 설정 
@@ -113,10 +112,16 @@ public class ApprovalController {
                     line.setApprovalType("APPROVAL");
                     approvalLines.add(line);
                 }
+            } else {
+            	System.out.println("결재선 데이터가 없습니다!");
             }
             
-            
-            
+            if (approvalLines.isEmpty()) {
+                model.addAttribute("error", "결재자를 최소 1명 이상 지정해주세요.");
+                List<LoginVO> deptUsers = approvalService.getUserListByDept(user.getDeptId());
+                model.addAttribute("deptUsers", deptUsers);
+                return "/approval/documentForm";
+            }
             
             // 문서와 결재선 함께 등록
             approvalService.insertDocumentWithApprovalLines(document, approvalLines);

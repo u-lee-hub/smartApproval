@@ -31,7 +31,7 @@
                 <!-- 문서 기본 정보 -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0">📄 문서 정보</h5>
+                        <h5 class="mb-0">문서 정보</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
@@ -59,7 +59,7 @@
                 <!-- 결재선 지정 -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0">👥 결재선 지정</h5>
+                        <h5 class="mb-0">결재선 지정</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
@@ -77,7 +77,7 @@
                         
                         <!-- 결재선 목록 -->
                         <div id="approvalLineList">
-                            <h6>📋 결재 순서</h6>
+                            <h6>결재 순서</h6>
                             <div class="list-group" id="approverList">
                                 <div class="text-muted text-center p-3" id="emptyMessage">
                                     결재자를 추가해주세요.
@@ -91,7 +91,7 @@
                 <div id="approvalInputs"></div>
 
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button type="submit" class="btn btn-primary btn-lg">📝 문서 등록</button>
+                    <button type="submit" class="btn btn-primary btn-lg">문서 등록</button>
                     <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary btn-lg">❌ 취소</a>
                 </div>
             </form>
@@ -163,25 +163,33 @@ function updateApproverList() {
     } else {
         // 결재자 목록 표시
         approvalLineData.forEach((approver, index) => {
+        	
             // 1. 화면에 결재자 목록 표시
             const listItem = document.createElement('div');
             listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-            listItem.innerHTML = `
-                <div>
-                    <span class="badge bg-primary rounded-pill me-2">${index + 1}차</span>
-                    <strong>${approver.approverName}</strong> 
-                    <small class="text-muted">(${approver.approverId})</small>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeApprover(${index})">🗑️ 제거</button>
-            `;
+            
+         	// 대신 문자열 결합 방식 사용 (JSP 충동 방지)
+            //const orderText = (index + 1) + '차';
+            const nameText = approver.approverName || '(이름없음)';
+            const idText = approver.approverId || '(ID없음)';
+            
+            listItem.innerHTML = 
+			    '<div>' +
+			        '<span class="badge bg-primary rounded-pill me-2">' + (index + 1) + '차</span>' +
+			        '<strong>' + nameText + '</strong>' +
+			        '<small class="text-muted">(' + idText + ')</small>' +
+			    '</div>' +
+			    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeApprover(' + index + ')">제거</button>';
+
             approverList.appendChild(listItem);
             
             // 2. 서버 전송용 hidden input 생성
             const idInput = document.createElement('input');
             idInput.type = 'hidden';
-            idInput.name = `approverIds[${index}]`;
+            idInput.name = 'approverIds';
             idInput.value = approver.approverId;
             inputsDiv.appendChild(idInput);
+            
         });
     }
 }
@@ -199,6 +207,7 @@ document.getElementById('documentForm').addEventListener('submit', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
     updateApproverList();
 });
+
 </script>
 <%@ include file="../frame/footer.jsp"%>
 <!-- Bootstrap JS Bundle -->

@@ -19,7 +19,7 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
 
 	private final ApprovalMapper approvalMapper;
     
-	// 문서 관련 메소드
+	// 문서 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * 결재 문서 등록
 	 */
@@ -46,7 +46,7 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
         return approvalMapper.selectDocumentById(documentId);
     }
     
-    // 결재선 관련 메소드 
+    // 결재선 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
     /**
      * 결재선 등록
      */
@@ -89,25 +89,5 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
         // 2. 생성된 documentId를 사용하여 결재선 등록
         insertApprovalLines(document.getDocumentId(), approvalLines);
     }
-    
-//    @Override
-//    public List<ApprovalLineVO> parseApprovalLinesFromJson(String json) throws Exception {
-//        List<ApprovalLineVO> approvalLines = new ArrayList<>();
-//        
-//        if (json != null && !json.trim().isEmpty()) {
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            List<ApprovalLineVO> lines = objectMapper.readValue(json, 
-//                objectMapper.getTypeFactory().constructCollectionType(List.class, ApprovalLineVO.class));
-//            
-//            for (int i = 0; i < lines.size(); i++) {
-//                ApprovalLineVO line = lines.get(i);
-//                line.setApprovalOrder(i + 1);
-//                line.setApprovalType("APPROVAL");
-//                approvalLines.add(line);
-//            }
-//        }
-//        
-//        return approvalLines;
-//    }
     
 }

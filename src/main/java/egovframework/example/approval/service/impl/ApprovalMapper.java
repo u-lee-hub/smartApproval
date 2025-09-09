@@ -14,7 +14,7 @@ import egovframework.example.login.service.LoginVO;
 @Mapper
 public interface ApprovalMapper {
 	
-	// 문서 관련 쿼리 
+// 문서 관련 쿼리 //////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * 결재 문서 등록
 	 * @param document
@@ -49,7 +49,7 @@ public interface ApprovalMapper {
             "FROM DOCUMENTS WHERE document_id = #{documentId}")
     ApprovalDocumentVO selectDocumentById(int documentId) throws Exception;
     
-    // 결재선 관련 쿼리 
+// 결재선 관련 쿼리 //////////////////////////////////////////////////////////////////////////////////////
     /**
      * 결재선 등록
      * @param approvalLine
