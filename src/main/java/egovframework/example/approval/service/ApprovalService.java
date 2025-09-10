@@ -32,5 +32,17 @@ public interface ApprovalService {
     // 결재 문서(결재선 포함) 등록 
     void insertDocumentWithApprovalLines(ApprovalDocumentVO document, List<ApprovalLineVO> approvalLines) throws Exception;
 
+ // 결재 처리 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
 
+    // 현재 결재 대기 중인 라인 조회 (문서별)
+    ApprovalLineVO getCurrentPendingLine(int documentId) throws Exception;
+
+    // 결재 승인 처리
+    void approveDocument(int documentId, String approverId, String comment) throws Exception;
+
+    // 결재 반려 처리
+    void rejectDocument(int documentId, String approverId, String comment) throws Exception;
+
+    // 나의 결재함 조회 
+    List<ApprovalDocumentVO> getMyApprovalInbox(String approverId) throws Exception;
 }

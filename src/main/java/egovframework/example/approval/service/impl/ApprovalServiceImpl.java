@@ -1,6 +1,5 @@
 package egovframework.example.approval.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
@@ -19,7 +18,7 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
 
 	private final ApprovalMapper approvalMapper;
     
-	// 문서 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
+// 문서 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * 결재 문서 등록
 	 */
@@ -46,7 +45,7 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
         return approvalMapper.selectDocumentById(documentId);
     }
     
-    // 결재선 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
+// 결재선 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
     /**
      * 결재선 등록
      */
@@ -88,6 +87,85 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
         
         // 2. 생성된 documentId를 사용하여 결재선 등록
         insertApprovalLines(document.getDocumentId(), approvalLines);
+    }
+    
+ // 결재 처리 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 현재 결재 대기 중인 라인 조회 (문서별)
+     */
+    @Override
+    public ApprovalLineVO getCurrentPendingLine(int documentId) throws Exception {
+        return approvalMapper.selectCurrentPendingLine(documentId);
+    }
+
+    /**
+     * 결재 승인 처리
+     */
+    @Override
+    @Transactional
+    public void approveDocument(int documentId, String approverId, String comment) throws Exception {
+        // 1. 현재 결재 대기 중인 라인 조회
+        ApprovalLineVO currentLine = approvalMapper.selectCurrentPendingLine(documentId);
+        
+        if (currentLine == null) {
+            throw new IllegalStateException("결재 대기 중인 라인이 없습니다.");
+        }
+        
+        // 2. 권한 검증 (현재 결재자와 요청자가 일치하는지 확인)
+        if (!approverId.equals(currentLine.getApproverId())) {
+            throw new SecurityException("결재 권한이 없습니다.");
+        }
+        
+        // 3. 결재선 승인 처리
+        int updated = approvalMapper.updateLineApproved(currentLine.getLineId(), comment);
+        if (updated == 0) {
+            throw new IllegalStateException("결재선 업데이트에 실패했습니다.");
+        }
+        
+        // 4. 다음 결재 대기 라인이 있는지 확인
+        ApprovalLineVO nextLine = approvalMapper.selectCurrentPendingLine(documentId);
+        
+        // 5. 더 이상 결재할 라인이 없으면 문서 상태를 APPROVED로 변경
+        if (nextLine == null) {
+            approvalMapper.updateDocumentStatus(documentId, "APPROVED");
+        }
+    }
+
+    /**
+     * 결재 반려 처리
+     */
+    @Override
+    @Transactional
+    public void rejectDocument(int documentId, String approverId, String comment) throws Exception {
+        // 1. 현재 결재 대기 중인 라인 조회
+        ApprovalLineVO currentLine = approvalMapper.selectCurrentPendingLine(documentId);
+        
+        if (currentLine == null) {
+            throw new IllegalStateException("결재 대기 중인 라인이 없습니다.");
+        }
+        
+        // 2. 권한 검증
+        if (!approverId.equals(currentLine.getApproverId())) {
+            throw new SecurityException("결재 권한이 없습니다.");
+        }
+        
+        // 3. 결재선 반려 처리
+        int updated = approvalMapper.updateLineRejected(currentLine.getLineId(), comment);
+        if (updated == 0) {
+            throw new IllegalStateException("결재선 업데이트에 실패했습니다.");
+        }
+        
+        // 4. 문서 상태를 REJECTED로 변경 (반려 시에는 즉시 전체 문서 반려)
+        approvalMapper.updateDocumentStatus(documentId, "REJECTED");
+    }
+
+    /**
+     * 나의 결재함 조회
+     */
+    @Override
+    public List<ApprovalDocumentVO> getMyApprovalInbox(String approverId) throws Exception {
+        return approvalMapper.selectMyApprovalInbox(approverId);
     }
     
 }
