@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import egovframework.example.approval.service.ApprovalDocumentVO;
 import egovframework.example.approval.service.ApprovalLineVO;
@@ -142,46 +143,137 @@ public class ApprovalController {
     
     
     ///// 문서 상세 조회 (결재 처리 화면)
+    
+    
+    
+    
+    
+    
+    /**
+     * 문서 상세 조회 (결재 처리 화면)
+     * @param documentId
+     * @param session
+     * @param model
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/document/detail.do")
-    public String documentDetail() throws Exception {
-    	
-    	
-    	
-    	return "/approval/dashboard";
-    }
-    
-    
-    
-    ///// 결재 승인 처리
-    @PostMapping("/document/approve.do")
-    public String approveDocument(HttpServletRequest request, HttpSession session, Model model) throws Exception {
-    	LoginVO user = (LoginVO) session.getAttribute("user");
+    public String documentDetail(@RequestParam("documentId") int documentId, HttpSession session, Model model) throws Exception {
+        LoginVO user = (LoginVO) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login.do";
         }
         
+        // 문서 정보 조회
+        ApprovalDocumentVO document = approvalService.getDocumentById(documentId);
+        if (document == null) {
+            model.addAttribute("error", "문서를 찾을 수 없습니다.");
+            return "redirect:/dashboard.do";
+        }
         
+        // 결재선 목록 조회
+        List<ApprovalLineVO> approvalLines = approvalService.getApprovalLinesByDocumentId(documentId);
         
-        return "/approval/dashboard";
+        // 현재 결재 대기 중인 라인 조회
+        ApprovalLineVO currentPendingLine = approvalService.getCurrentPendingLine(documentId);
+        
+        // 현재 사용자가 결재 권한이 있는지 확인
+        boolean canApprove = false;
+        if (currentPendingLine != null && user.getUserId().equals(currentPendingLine.getApproverId())) {
+            canApprove = true;
+        }
+        
+        model.addAttribute("document", document);
+        model.addAttribute("approvalLines", approvalLines);
+        model.addAttribute("currentPendingLine", currentPendingLine);
+        model.addAttribute("canApprove", canApprove);
+        
+        return "/approval/documentDetail";
     }
-    
-    
-    ///// 결재 반려 처리
+
+    /**
+     * 결재 승인 처리
+     * @param documentId
+     * @param comment
+     * @param session
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/document/approve.do")
+    public String approveDocument(@RequestParam("documentId") int documentId, 
+                                 @RequestParam(value = "comment", required = false) String comment,
+                                 HttpSession session, Model model) throws Exception {
+        LoginVO user = (LoginVO) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login.do";
+        }
+        
+        try {
+            approvalService.approveDocument(documentId, user.getUserId(), comment);
+            model.addAttribute("success", "결재 승인이 완료되었습니다.");
+        } catch (Exception e) {
+            model.addAttribute("error", "결재 승인 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        
+        return "redirect:/document/detail.do?documentId=" + documentId;
+    }
+
+    /**
+     * 결재 반려 처리
+     * @param documentId
+     * @param comment
+     * @param session
+     * @param model
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/document/reject.do")
-    public String rejectDocument(HttpServletRequest request, HttpSession session, Model model) throws Exception {
-    	
-    	
-    	
-    	return "";
+    public String rejectDocument(@RequestParam("documentId") int documentId,
+                                @RequestParam("comment") String comment,
+                                HttpSession session, Model model) throws Exception {
+        LoginVO user = (LoginVO) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login.do";
+        }
+        
+        // 반려 시에는 의견이 필수
+        if (comment == null || comment.trim().isEmpty()) {
+            model.addAttribute("error", "반려 사유를 입력해주세요.");
+            return "redirect:/document/detail.do?documentId=" + documentId;
+        }
+        
+        try {
+            approvalService.rejectDocument(documentId, user.getUserId(), comment);
+            model.addAttribute("success", "결재 반려가 완료되었습니다.");
+        } catch (Exception e) {
+            model.addAttribute("error", "결재 반려 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        
+        return "redirect:/document/detail.do?documentId=" + documentId;
     }
-    
-    
-    
-    ///// 나의 문서함 조회
-    public String myApprovalInbox()throws Exception {
-    	
-    	
-    	return "";
+
+    /**
+     * 나의 결재함
+     * @param session
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/approval/inbox.do")
+    public String myApprovalInbox(HttpSession session, Model model) throws Exception {
+        LoginVO user = (LoginVO) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login.do";
+        }
+        
+        // 나에게 온 결재 대기 문서 목록 조회
+        List<ApprovalDocumentVO> inboxDocuments = approvalService.getMyApprovalInbox(user.getUserId());
+        
+        model.addAttribute("inboxDocuments", inboxDocuments);
+        model.addAttribute("userName", user.getUserName());
+        
+        return "/approval/myApprovalInbox";
     }
 	
     
