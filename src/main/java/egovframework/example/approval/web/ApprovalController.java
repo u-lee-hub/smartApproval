@@ -139,5 +139,50 @@ public class ApprovalController {
             return "/approval/documentForm";
         }
     }
+    
+    
+    ///// 문서 상세 조회 (결재 처리 화면)
+    @GetMapping("/document/detail.do")
+    public String documentDetail() throws Exception {
+    	
+    	
+    	
+    	return "/approval/dashboard";
+    }
+    
+    
+    
+    ///// 결재 승인 처리
+    @PostMapping("/document/approve.do")
+    public String approveDocument(HttpServletRequest request, HttpSession session, Model model) throws Exception {
+    	LoginVO user = (LoginVO) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login.do";
+        }
+        
+        
+        
+        return "/approval/dashboard";
+    }
+    
+    
+    ///// 결재 반려 처리
+    @PostMapping("/document/reject.do")
+    public String rejectDocument(HttpServletRequest request, HttpSession session, Model model) throws Exception {
+    	
+    	
+    	
+    	return "";
+    }
+    
+    
+    
+    ///// 나의 문서함 조회
+    public String myApprovalInbox()throws Exception {
+    	
+    	
+    	return "";
+    }
 	
+    
 }
