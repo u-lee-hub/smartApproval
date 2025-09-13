@@ -27,7 +27,7 @@
 				<h1 class="mb-4">전자결재 시스템 대시보드</h1>
 			</div>
 		</div>
-		<div class="mt-3 text-center">
+<%-- 		<div class="mt-3 text-center">
 			<a href="${pageContext.request.contextPath}/document/form.do"
 				class="btn btn-success btn-lg"> 
 				<i class="fas fa-plus"></i> 새 결재 문서 작성
@@ -87,7 +87,35 @@
 					</div>
 				</div>
 			</div>
+		</div> --%>
+
+		<div class="row mt-4">
+			<div class="col-md-6">
+				<div class="card h-100">
+					<div class="card-body text-center">
+						<h5 class="card-title">📝 문서 작성</h5>
+						<p class="card-text">새로운 결재 문서를 작성합니다.</p>
+						<a href="${pageContext.request.contextPath}/document/form.do"
+							class="btn btn-primary">문서 작성</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card h-100">
+					<div class="card-body text-center">
+						<h5 class="card-title">📥 나의 결재함</h5>
+						<p class="card-text">결재 대기 중인 문서를 처리합니다.</p>
+						<a href="${pageContext.request.contextPath}/approval/inbox.do"
+							class="btn btn-success">결재함 이동</a>
+					</div>
+				</div>
+			</div>
 		</div>
+
+
+
+
+
 
 		<div class="row">
 			<div class="col-12">

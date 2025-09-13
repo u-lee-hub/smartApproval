@@ -13,10 +13,6 @@
             padding-top: 70px;
             background-color: #f8f9fa;
         }
-        .login-container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
     </style>
 </head>
 <body>
