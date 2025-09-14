@@ -1,6 +1,7 @@
 package egovframework.example.approval.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
@@ -91,7 +92,7 @@ public interface ApprovalMapper {
     		+ "ORDER BY user_name")
     List<LoginVO> selectUserListByDept(String deptId) throws Exception;
     
- // 결재 처리 관련 쿼리 //////////////////////////////////////////////////////////////////////////////////////
+// 결재 처리 관련 쿼리 //////////////////////////////////////////////////////////////////////////////////////
     /**
      * 현재 결재 대기 중인 라인 조회 (문서별)
      * @param documentId
@@ -155,4 +156,48 @@ public interface ApprovalMapper {
             + "WHERE al.approver_id = #{approverId} AND al.status = 'PENDING' AND d.status = 'PENDING' "
             + "ORDER BY d.created_at DESC")
     List<ApprovalDocumentVO> selectMyApprovalInbox(String approverId) throws Exception;
+    
+// 대시보드용 쿼리 //////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 내가 올린 최근 결재 문서 조회 (최근 5건)
+     * @param authorId
+     * @return
+     * @throws Exception
+     */
+    @Select("SELECT document_id AS documentId, title, document_type AS documentType, "
+    		+ "author_id AS authorId, status, created_at AS createdAt "
+            + "FROM DOCUMENTS "
+            + "WHERE author_id = #{authorId} "
+            + "ORDER BY created_at DESC LIMIT 5")
+    List<ApprovalDocumentVO> selectRecentDocumentsByAuthor(String authorId) throws Exception;
+
+    /**
+     * 내가 결재해야 할 문서 조회 (최근 5건)
+     * @param approverId
+     * @return
+     * @throws Exception
+     */
+    @Select("SELECT d.document_id AS documentId, d.title, d.document_type AS documentType, "
+    		+ "d.author_id AS authorId, d.status, d.created_at AS createdAt "
+    		+ "FROM DOCUMENTS d "
+    		+ "JOIN APPROVAL_LINES al "
+    		+ "ON d.document_id = al.document_id "
+    		+ "WHERE al.approver_id = #{approverId} AND al.status = 'PENDING' AND d.status = 'PENDING' "
+    		+ "ORDER BY d.created_at DESC LIMIT 5")
+    List<ApprovalDocumentVO> selectPendingDocumentsForApprover(String approverId) throws Exception;
+
+    /**
+     * 내가 올린 문서 상태별 개수 조회
+     * @param authorId
+     * @return
+     * @throws Exception
+     */
+    @Select("SELECT "
+    		+ "COUNT(CASE WHEN status = 'PENDING' THEN 1 END) AS pendingCount, "
+    		+ "COUNT(CASE WHEN status = 'APPROVED' THEN 1 END) AS approvedCount, "
+    		+ "COUNT(CASE WHEN status = 'REJECTED' THEN 1 END) AS rejectedCount, "
+    		+ "COUNT(*) AS totalCount "
+            + "FROM DOCUMENTS WHERE author_id = #{authorId}")
+    Map<String, Integer> selectDocumentStatusCount(String authorId) throws Exception;  
+    
 }

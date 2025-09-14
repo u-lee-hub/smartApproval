@@ -1,6 +1,7 @@
 package egovframework.example.approval.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.springframework.stereotype.Service;
@@ -89,7 +90,7 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
         insertApprovalLines(document.getDocumentId(), approvalLines);
     }
     
- // 결재 처리 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
+// 결재 처리 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 현재 결재 대기 중인 라인 조회 (문서별)
@@ -166,6 +167,31 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
     @Override
     public List<ApprovalDocumentVO> getMyApprovalInbox(String approverId) throws Exception {
         return approvalMapper.selectMyApprovalInbox(approverId);
+    }
+    
+// 대시보드 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 내가 올린 최근 결재 문서 조회 (최근 5건)
+     */
+    @Override
+    public List<ApprovalDocumentVO> getRecentDocumentsByAuthor(String authorId) throws Exception {
+        return approvalMapper.selectRecentDocumentsByAuthor(authorId);
+    }
+
+    /**
+     * 내가 결재해야 할 문서 조회 (최근 5건)
+     */
+    @Override
+    public List<ApprovalDocumentVO> getPendingDocumentsForApprover(String approverId) throws Exception {
+        return approvalMapper.selectPendingDocumentsForApprover(approverId);
+    }
+
+    /**
+     * 내가 올린 문서 상태별 개수 조회
+     */
+    @Override
+    public Map<String, Integer> getDocumentStatusCount(String authorId) throws Exception {
+        return approvalMapper.selectDocumentStatusCount(authorId);
     }
     
 }

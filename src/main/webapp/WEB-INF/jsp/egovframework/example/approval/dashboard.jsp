@@ -4,7 +4,7 @@
 <html>
 <head>
 	<meta charset="UTF-8" />
-	<title>메인 대시보드</title>
+	<title>전자 결재 시스템</title>
 	
 	<!-- 공통 스타일과 라이브러리 -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,20 +19,107 @@
 	<%@ include file="../frame/header.jsp"%>
 	
 	<%-- 메인 컨텐츠 --%>
-	<main class="container my-4" role="main">
-		<h2>${userName}님으로 로그인하셨습니다!</h2>
-		<a href="logout.do">로그아웃</a>
-		<div class="row">
-			<div class="col-12">
-				<h1 class="mb-4">전자결재 시스템 대시보드</h1>
-			</div>
-		</div>
+	<main class="container mt-5" role="main">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">대시보드</h1>
+            <p class="text-muted mb-4">안녕하세요, <strong>${userName}</strong>님! 오늘도 좋은 하루 되세요.</p>
+        </div>
+    </div>
+    
+    <!-- 결재 현황 카드 -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📄 내가 올린 결재 현황</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">총 ${totalCount}건의 결재 요청서가 있습니다.</p>
+                    
+                    <!-- 상태별 통계 -->
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <div class="card border-warning">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title text-warning">${pendingCount}</h6>
+                                    <small class="text-muted">결재대기</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="card border-success">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title text-success">${approvedCount}</h6>
+                                    <small class="text-muted">승인완료</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="card border-danger">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title text-danger">${rejectedCount}</h6>
+                                    <small class="text-muted">반려</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 최근 문서 목록 -->
+                    <c:choose>
+                        <c:when test="${empty myRecentDocuments}">
+                            <div class="text-center text-muted py-3">
+                                <p>작성한 결재 문서가 없습니다.</p>
+                                <a href="${pageContext.request.contextPath}/document/form.do" class="btn btn-primary btn-sm">
+                                    📝 문서 작성하기
+                                </a>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <ul class="list-group list-group-flush">
+                                <c:forEach var="doc" items="${myRecentDocuments}">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>${doc.title}</strong>
+                                            <br><small class="text-muted">${doc.documentType}</small>
+                                        </div>
+                                        <c:choose>
+                                            <c:when test="${doc.status == 'PENDING'}">
+                                                <span class="badge bg-warning text-dark">결재대기</span>
+                                            </c:when>
+                                            <c:when test="${doc.status == 'APPROVED'}">
+                                                <span class="badge bg-success">승인완료</span>
+                                            </c:when>
+                                            <c:when test="${doc.status == 'REJECTED'}">
+                                                <span class="badge bg-danger">반려</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge bg-secondary">${doc.status}</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </li>
+                                </c:forEach>
+                            </ul>
+                            <div class="mt-3 text-center">
+                                <a href="${pageContext.request.contextPath}/document/myDocuments.do" class="btn btn-outline-primary btn-sm">
+                                    전체 보기
+                                </a>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+        </div>
+    
+    
+</div>    
 <%-- 		<div class="mt-3 text-center">
 			<a href="${pageContext.request.contextPath}/document/form.do"
 				class="btn btn-success btn-lg"> 
 				<i class="fas fa-plus"></i> 새 결재 문서 작성
 			</a>
 		</div>
+--%>
 		<div class="row">
 			<div class="col-md-6">
 				<div class="card shadow-sm mb-4">
@@ -87,10 +174,10 @@
 					</div>
 				</div>
 			</div>
-		</div> --%>
+		</div> <%-- --%>
 
 		<div class="row mt-4">
-			<div class="col-md-6">
+			<div class="col-md-4">
 				<div class="card h-100">
 					<div class="card-body text-center">
 						<h5 class="card-title">📝 문서 작성</h5>
@@ -100,7 +187,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-4">
 				<div class="card h-100">
 					<div class="card-body text-center">
 						<h5 class="card-title">📥 나의 결재함</h5>
@@ -110,6 +197,40 @@
 					</div>
 				</div>
 			</div>
+		    <div class="col-md-4">
+		       <div class="card h-100">
+		           <div class="card-body text-center">
+		               <h5 class="card-title">📄 내 문서</h5>
+		               <p class="card-text">내가 작성한 문서를 조회합니다.</p>
+		               <a href="${pageContext.request.contextPath}/document/myDocuments.do" class="btn btn-info">문서 목록</a>
+		           </div>
+		       </div>
+		   </div>
+		   
+		    <div class="col-md-4">
+		        <div class="card bg-warning text-white">
+		            <div class="card-body text-center">
+		                <h4>${pendingCount}</h4>
+		                <p>결재 대기</p>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="col-md-4">
+		        <div class="card bg-success text-white">
+		            <div class="card-body text-center">
+		                <h4>${approvedCount}</h4>
+		                <p>승인 완료</p>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="col-md-4">
+		        <div class="card bg-danger text-white">
+		            <div class="card-body text-center">
+		                <h4>${rejectedCount}</h4>
+		                <p>반려</p>
+		            </div>
+		        </div>
+		    </div>
 		</div>
 
 

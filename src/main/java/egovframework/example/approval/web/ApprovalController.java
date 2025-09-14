@@ -2,6 +2,7 @@ package egovframework.example.approval.web;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -44,13 +45,47 @@ public class ApprovalController {
 		// 세션에서 로그인 사용자 가져오기
 		LoginVO user = (LoginVO) session.getAttribute("user");
         if (user == null) {
-        	
-//        	System.out.println("No user in session, redirecting to login");
-        	
             return "redirect:/login.do";
         }
-        model.addAttribute("userName", user.getUserName());
+        
+        try {
+            // 기본 사용자 정보
+            model.addAttribute("userName", user.getUserName());
+            
+            // 내가 올린 최근 문서 목록 (최근 5건)
+            List<ApprovalDocumentVO> myRecentDocuments = approvalService.getRecentDocumentsByAuthor(user.getUserId());
+            model.addAttribute("myRecentDocuments", myRecentDocuments);
+            
+            // 내가 결재해야 할 문서 목록 (최근 5건)
+            List<ApprovalDocumentVO> pendingDocuments = approvalService.getPendingDocumentsForApprover(user.getUserId());
+            model.addAttribute("pendingDocuments", pendingDocuments);
+            
+            // 내가 올린 문서 상태별 개수
+            Map<String, Integer> statusCount = approvalService.getDocumentStatusCount(user.getUserId());
+            model.addAttribute("pendingCount", statusCount.getOrDefault("pendingCount", 0));
+            model.addAttribute("approvedCount", statusCount.getOrDefault("approvedCount", 0));
+            model.addAttribute("rejectedCount", statusCount.getOrDefault("rejectedCount", 0));
+            model.addAttribute("totalCount", statusCount.getOrDefault("totalCount", 0));
+            
+            // 결재 대기 문서 개수
+            model.addAttribute("pendingApprovalCount", pendingDocuments.size());
+            
+        } catch (Exception e) {
+            // 오류 발생 시 기본값 설정
+            model.addAttribute("myRecentDocuments", new ArrayList<ApprovalDocumentVO>());
+            model.addAttribute("pendingDocuments", new ArrayList<ApprovalDocumentVO>());
+            model.addAttribute("pendingCount", 0);
+            model.addAttribute("approvedCount", 0);
+            model.addAttribute("rejectedCount", 0);
+            model.addAttribute("totalCount", 0);
+            model.addAttribute("pendingApprovalCount", 0);
+            
+            System.err.println("Dashboard data loading error: " + e.getMessage());
+        }
+        
         return "/approval/dashboard";
+//        model.addAttribute("userName", user.getUserName());
+//        return "/approval/dashboard";
     }
 	
 	/**
@@ -140,14 +175,6 @@ public class ApprovalController {
             return "/approval/documentForm";
         }
     }
-    
-    
-    ///// 문서 상세 조회 (결재 처리 화면)
-    
-    
-    
-    
-    
     
     /**
      * 문서 상세 조회 (결재 처리 화면)
@@ -275,6 +302,26 @@ public class ApprovalController {
         
         return "/approval/myApprovalInbox";
     }
-	
     
+    /**
+     * 내가 작성한 문서 목록
+     * @param session
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/document/myDocuments.do")
+    public String myDocuments(HttpSession session, Model model) throws Exception {
+        LoginVO user = (LoginVO) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login.do";
+        }
+        
+        List<ApprovalDocumentVO> myDocuments = approvalService.getDocumentListByAuthor(user.getUserId());
+        model.addAttribute("myDocuments", myDocuments);
+        model.addAttribute("userName", user.getUserName());
+        
+        return "/approval/myDocuments";
+    }
+
 }
