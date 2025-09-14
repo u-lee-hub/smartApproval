@@ -71,7 +71,7 @@ public interface ApprovalMapper {
      */
     @Select("SELECT al.line_id AS lineId, al.document_id AS documentId, al.approver_id AS approverId, "
     		+ "u.user_name AS approverName, al.approval_order AS approvalOrder, al.approval_type AS approvalType, "
-            + "al.status, al.approved_at AS approvedAt, al.comment, al.created_at AS createdAt"
+            + "al.status, al.approved_at AS approvedAt, al.comment, al.created_at AS createdAt "
             + "FROM APPROVAL_LINES al "
             + "JOIN USERS u "
             + "ON al.approver_id = u.user_id "
