@@ -20,7 +20,7 @@
 <main class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <h2 class="mb-4">📄 내가 작성한 문서</h2>
+            <h2 class="mb-4">내가 작성한 문서</h2>
             
             <!-- 사용자 정보 -->
             <div class="alert alert-primary mb-4">
@@ -30,7 +30,7 @@
             <!-- 문서 목록 -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">📋 문서 목록</h5>
+                    <h5 class="mb-0">문서 목록</h5>
                 </div>
                 <div class="card-body">
                     <c:choose>
@@ -40,7 +40,7 @@
                                 <h5 class="mt-3">작성한 문서가 없습니다.</h5>
                                 <p>새로운 문서를 작성해보세요.</p>
                                 <a href="${pageContext.request.contextPath}/document/form.do" class="btn btn-primary">
-                                    📝 문서 작성하기
+                                    문서 작성하기
                                 </a>
                             </div>
                         </c:when>
@@ -92,13 +92,47 @@
                                                 <td class="text-center">
                                                     <a href="${pageContext.request.contextPath}/document/detail.do?documentId=${document.documentId}" 
                                                        class="btn btn-outline-primary btn-sm">
-                                                        👁️ 보기
+                                                        보기
                                                     </a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
                                     </tbody>
                                 </table>
+                                <!-- 페이징 처리 -->
+                                <c:if test="${not empty myDocuments}">
+							    <!-- 페이징 네비게이션 -->
+							    <nav aria-label="Page navigation" class="mt-4">
+							        <ul class="pagination justify-content-center">
+							            <!-- 이전 버튼 -->
+							            <c:if test="${currentPage > 1}">
+							                <li class="page-item">
+							                    <a class="page-link" href="?page=${currentPage - 1}">이전</a>
+							                </li>
+							            </c:if>
+							            
+							            <!-- 페이지 번호들 -->
+							            <c:forEach begin="${startPage}" end="${endPage}" var="pageNum">
+							                <li class="page-item ${pageNum == currentPage ? 'active' : ''}">
+							                    <a class="page-link" href="?page=${pageNum}">${pageNum}</a>
+							                </li>
+							            </c:forEach>
+							            
+							            <!-- 다음 버튼 -->
+							            <c:if test="${currentPage < totalPages}">
+							                <li class="page-item">
+							                    <a class="page-link" href="?page=${currentPage + 1}">다음</a>
+							                </li>
+							            </c:if>
+							        </ul>
+							    </nav>
+							    
+							    <!-- 페이징 정보 -->
+							    <div class="text-center text-muted">
+							        <small>총 ${totalDocuments}건 중 ${(currentPage-1) * pageSize + 1}~${currentPage * pageSize > totalDocuments ? totalDocuments : currentPage * pageSize}건 표시 (${currentPage}/${totalPages} 페이지)</small>
+							    </div>
+							</c:if>
+                                
                             </div>
                         </c:otherwise>
                     </c:choose>
@@ -107,8 +141,8 @@
             
             <!-- 하단 버튼 -->
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                <a href="${pageContext.request.contextPath}/document/form.do" class="btn btn-primary">📝 새 문서 작성</a>
-                <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary">🏠 대시보드</a>
+                <a href="${pageContext.request.contextPath}/document/form.do" class="btn btn-primary">새 문서 작성</a>
+                <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary">대시보드</a>
             </div>
         </div>
     </div>

@@ -55,4 +55,12 @@ public interface ApprovalService {
 
     // 내가 올린 문서 상태별 개수 조회
     Map<String, Integer> getDocumentStatusCount(String authorId) throws Exception;
+    
+ // 페이징 처리용 메소드 //////////////////////////////////////////////////////////////////////////////////////
+    // 내가 작성한 문서 총 개수
+    int getDocumentCountByAuthor(String authorId) throws Exception;
+    
+    // 내가 작성한 문서 목록 (페이징)
+    List<ApprovalDocumentVO> getDocumentListByAuthorWithPaging(String authorId, int offset, int pageSize) throws Exception;
+    
 }

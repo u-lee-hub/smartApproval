@@ -22,7 +22,7 @@
 <main class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <h2 class="mb-4">📥 나의 결재함</h2>
+            <h2 class="mb-4">나의 결재함</h2>
             
             <!-- 사용자 정보 -->
             <div class="alert alert-info mb-4">
@@ -32,7 +32,7 @@
             <!-- 결재 대기 문서 목록 -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">📋 결재 대기 문서 목록</h5>
+                    <h5 class="mb-0">결재 대기 문서 목록</h5>
                 </div>
                 <div class="card-body">
                     <c:choose>
@@ -80,7 +80,7 @@
                                                 <td class="text-center">
                                                     <a href="${pageContext.request.contextPath}/document/detail.do?documentId=${document.documentId}" 
                                                        class="btn btn-primary btn-sm">
-                                                        📄 처리
+                                                        처리
                                                     </a>
                                                 </td>
                                             </tr>
@@ -95,7 +95,7 @@
             
             <!-- 하단 버튼 -->
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary">🏠 대시보드</a>
+                <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary">대시보드</a>
             </div>
         </div>
     </div>

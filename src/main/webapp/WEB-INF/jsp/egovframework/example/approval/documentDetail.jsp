@@ -36,7 +36,7 @@
             <!-- 문서 정보 -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">📋 문서 정보</h5>
+                    <h5 class="mb-0">문서 정보</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -85,7 +85,7 @@
             <!-- 결재선 정보 -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">👥 결재선 현황</h5>
+                    <h5 class="mb-0">결재선 현황</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -169,8 +169,8 @@
             
             <!-- 하단 버튼 -->
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="${pageContext.request.contextPath}/approval/inbox.do" class="btn btn-primary">📥 나의 결재함</a>
-                <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary">🏠 대시보드</a>
+                <a href="${pageContext.request.contextPath}/approval/inbox.do" class="btn btn-primary">나의 결재함</a>
+                <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary">대시보드</a>
             </div>
         </div>
     </div>

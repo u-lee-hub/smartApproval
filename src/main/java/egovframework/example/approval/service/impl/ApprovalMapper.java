@@ -200,4 +200,29 @@ public interface ApprovalMapper {
             + "FROM DOCUMENTS WHERE author_id = #{authorId}")
     Map<String, Integer> selectDocumentStatusCount(String authorId) throws Exception;  
     
+// 페이징 처리용 쿼리 //////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 내가 작성한 문서 총 개수
+     * @param authorId
+     * @return
+     * @throws Exception
+     */
+    @Select("SELECT COUNT(*) FROM DOCUMENTS WHERE author_id = #{authorId}")
+    int selectDocumentCountByAuthor(String authorId) throws Exception;
+
+    /**
+     * 내가 작성한 문서 목록 (페이징)
+     * @param authorId
+     * @param offset
+     * @param pageSize
+     * @return
+     * @throws Exception
+     */
+    @Select("SELECT document_id AS documentId, title, content, document_type AS documentType, "
+    		+ "author_id AS authorId, dept_id AS deptId, status, created_at AS createdAt, updated_at AS updatedAt "
+            + "FROM DOCUMENTS "
+            + "WHERE author_id = #{authorId} "
+            + "ORDER BY created_at DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<ApprovalDocumentVO> selectDocumentListByAuthorWithPaging(
+        @Param("authorId") String authorId, @Param("offset") int offset, @Param("pageSize") int pageSize) throws Exception;
 }

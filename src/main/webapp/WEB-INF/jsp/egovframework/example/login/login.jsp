@@ -33,13 +33,19 @@
                 <input type="password" class="form-control" id="password" name="password" required />
             </div>
             <button type="submit" class="btn btn-primary w-100">로그인</button>
+
         </form>
         <c:if test="${not empty error}">
             <div class="alert alert-danger mt-3" role="alert">
                 ${error}
             </div>
         </c:if>
-    </main>
+		<div class="text-center mt-3">
+			<p class="text-muted">아직 계정이 없으신가요?</p>
+			<a href="${pageContext.request.contextPath}/register.do"
+				class="btn btn-outline-primary">회원가입</a>
+		</div>
+	</main>
     	
     <%@ include file="../frame/footer.jsp"%>
     <!-- Bootstrap JS Bundle -->

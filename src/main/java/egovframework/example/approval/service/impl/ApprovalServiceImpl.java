@@ -193,5 +193,21 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
     public Map<String, Integer> getDocumentStatusCount(String authorId) throws Exception {
         return approvalMapper.selectDocumentStatusCount(authorId);
     }
+// 페이징 처리용 메소드 //////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 내가 작성한 문서 총 개수
+     */
+    @Override
+    public int getDocumentCountByAuthor(String authorId) throws Exception {
+        return approvalMapper.selectDocumentCountByAuthor(authorId);
+    }
+
+    /**
+     * 내가 작성한 문서 목록 (페이징)
+     */
+    @Override
+    public List<ApprovalDocumentVO> getDocumentListByAuthorWithPaging(String authorId, int offset, int pageSize) throws Exception {
+        return approvalMapper.selectDocumentListByAuthorWithPaging(authorId, offset, pageSize);
+    }
     
 }

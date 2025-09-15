@@ -64,6 +64,11 @@ body {
 		<c:if test="${not empty success}">
 			<div class="alert alert-success mt-3">${success}</div>
 		</c:if>
+		
+		<div class="text-center mt-3">
+		    <p class="text-muted">이미 계정이 있으신가요?</p>
+		    <a href="${pageContext.request.contextPath}/login.do" class="btn btn-outline-primary">로그인</a>
+		</div>
 	</main>
 	
 	<%@ include file="../frame/footer.jsp"%>
