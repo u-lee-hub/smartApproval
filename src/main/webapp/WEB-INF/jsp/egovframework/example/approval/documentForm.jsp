@@ -50,9 +50,65 @@
                             <textarea class="form-control" id="content" name="content" rows="8" required></textarea>
                         </div>
                     </div>
-                </div>
 
-                <!-- 결재선 지정 -->
+						<!-- ⭐ 지출금액 필드 추가 -->
+						<div class="form-group">
+							<label for="expenseAmount">지출금액 (원):</label> <input type="number"
+								id="expenseAmount" name="expenseAmount" min="0" max="99999999"
+								placeholder="지출금액을 입력하세요" onchange="previewAutoApproval()">
+						</div>
+
+
+					</div>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<!-- ⭐ 결재선 선택 방식 추가 -->
+    <div class="form-group">
+        <label>결재선 선택:</label>
+        <div>
+            <input type="radio" id="autoApproval" name="approvalType" value="auto" 
+                   onchange="toggleApprovalType()" checked>
+            <label for="autoApproval">자동 결재선</label>
+            
+            <input type="radio" id="manualApproval" name="approvalType" value="manual" 
+                   onchange="toggleApprovalType()">
+            <label for="manualApproval">수동 결재선</label>
+        </div>
+    </div>
+
+    <!-- ⭐ 자동 결재선 미리보기 -->
+    <div id="autoApprovalPreview" class="form-group">
+        <label>예상 결재선:</label>
+        <div id="previewResult" style="padding: 10px; background-color: #f5f5f5; border-radius: 5px;">
+            금액을 입력하면 자동으로 결재선이 표시됩니다.
+        </div>
+    </div>
+
+    <!-- 기존 수동 결재선 선택 (숨김 처리) -->
+    <div id="manualApprovalSection" class="form-group" style="display: none;">
+        <label for="approvers">결재자 선택:</label>
+        <select name="approverIds" multiple size="5">
+            <c:forEach var="user" items="${deptUsers}">
+                <option value="${user.userId}">${user.userName} (${user.roleId})</option>
+            </c:forEach>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="문서 등록" class="btn btn-primary">
+        <a href="/dashboard.do" class="btn btn-secondary">취소</a>
+    </div>
+
+
+
+
+
+
+
+
+	
+
+					<!-- 결재선 지정 -->
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">결재선 지정</h5>
@@ -90,6 +146,7 @@
                     <button type="submit" class="btn btn-primary btn-lg">문서 등록</button>
                     <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary btn-lg">❌ 취소</a>
                 </div>
+                
             </form>
 
             <c:if test="${not empty error}">
@@ -100,6 +157,79 @@
 </main>
 
 <script>
+
+function toggleApprovalType() {
+    const autoApproval = document.getElementById('autoApproval').checked;
+    const autoPreview = document.getElementById('autoApprovalPreview');
+    const manualSection = document.getElementById('manualApprovalSection');
+    
+    if (autoApproval) {
+        autoPreview.style.display = 'block';
+        manualSection.style.display = 'none';
+        previewAutoApproval();
+    } else {
+        autoPreview.style.display = 'none';
+        manualSection.style.display = 'block';
+    }
+}
+
+function previewAutoApproval() {
+    const amount = document.getElementById('expenseAmount').value;
+    const documentType = document.querySelector('select[name="documentType"]').value;
+    
+    if (!amount || amount == 0) {
+        document.getElementById('previewResult').innerHTML = '금액을 입력하면 자동으로 결재선이 표시됩니다.';
+        return;
+    }
+
+    let previewText = '';
+    if (amount < 100000) {
+        previewText = '팀장만 (1단계)';
+    } else if (amount < 500000) {
+        previewText = '팀장 → 부서장 (2단계)';
+    } else {
+        previewText = '팀장 → 부서장 → 대표 (3단계)';
+    }
+    
+    document.getElementById('previewResult').innerHTML = 
+        `<strong>${amount.toLocaleString()}원</strong> → ${previewText}`;
+}
+
+// 페이지 로드시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    toggleApprovalType();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let approvalLineData = [];
 
 // 결재자 추가

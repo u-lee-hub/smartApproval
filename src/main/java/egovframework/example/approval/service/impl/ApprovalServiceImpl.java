@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements ApprovalService {
 
 	private final ApprovalMapper approvalMapper;
+
     
 // 문서 관련 메소드 //////////////////////////////////////////////////////////////////////////////////////
 	/**
@@ -193,6 +194,7 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
     public Map<String, Integer> getDocumentStatusCount(String authorId) throws Exception {
         return approvalMapper.selectDocumentStatusCount(authorId);
     }
+    
 // 페이징 처리용 메소드 //////////////////////////////////////////////////////////////////////////////////////
     /**
      * 내가 작성한 문서 총 개수
@@ -209,5 +211,5 @@ public class ApprovalServiceImpl extends EgovAbstractServiceImpl implements Appr
     public List<ApprovalDocumentVO> getDocumentListByAuthorWithPaging(String authorId, int offset, int pageSize) throws Exception {
         return approvalMapper.selectDocumentListByAuthorWithPaging(authorId, offset, pageSize);
     }
-    
+  
 }

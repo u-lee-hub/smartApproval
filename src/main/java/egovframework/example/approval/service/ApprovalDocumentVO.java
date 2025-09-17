@@ -32,6 +32,9 @@ public class ApprovalDocumentVO {
     
     /** 수정일 */
     private String updatedAt;
+    
+    /** 지출 금액 */
+    private int expenseAmount;
 
 	public int getDocumentId() {
 		return documentId;
@@ -104,4 +107,13 @@ public class ApprovalDocumentVO {
 	public void setUpdatedAt(String updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+
+	public int getExpenseAmount() {
+		return expenseAmount;
+	}
+
+	public void setExpenseAmount(int expenseAmount) {
+		this.expenseAmount = expenseAmount;
+	}
+
 }

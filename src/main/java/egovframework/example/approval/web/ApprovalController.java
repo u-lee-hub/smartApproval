@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import egovframework.example.approval.service.ApprovalDocumentVO;
 import egovframework.example.approval.service.ApprovalLineVO;
 import egovframework.example.approval.service.ApprovalService;
+import egovframework.example.approvalrule.service.ApprovalRuleService;
 import egovframework.example.login.service.LoginVO;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ApprovalController {
 	
 	private final ApprovalService approvalService;
+	private final ApprovalRuleService approvalRuleService;	// 자동 결재 라인 
 	
 //	@GetMapping(value = "/dashboard.do")
 //	public String dashboard(Model model) throws Exception {
@@ -121,7 +123,7 @@ public class ApprovalController {
     }
     
     /**
-     * 결재 문서 등록 처리 (결재선 포함)
+     * 결재 문서 등록 처리 (자동결재 + 수동결재)
      * @param request
      * @param session
      * @param model
@@ -134,23 +136,47 @@ public class ApprovalController {
         if (user == null) {
             return "redirect:/login.do";
         }
-        
+
         String title = request.getParameter("title");
         String content = request.getParameter("content");
         String documentType = request.getParameter("documentType");
-        String[] approverIds = request.getParameterValues("approverIds");  //뷰에서 전송되는 데이터 배열로 받기 
-        
-        // 문서 정보 설정 
+        String expenseAmountStr = request.getParameter("expenseAmount"); 
+        String approvalType = request.getParameter("approvalType"); // auto or manual
+
+        // 문서 정보 설정
         ApprovalDocumentVO document = new ApprovalDocumentVO();
         document.setTitle(title);
         document.setContent(content);
         document.setDocumentType(documentType);
         document.setAuthorId(user.getUserId());
         document.setDeptId(user.getDeptId());
-        
+
+        // 지출금액 설정
+        if (expenseAmountStr != null && !expenseAmountStr.trim().isEmpty()) {
+            try {
+                document.setExpenseAmount(Integer.parseInt(expenseAmountStr));
+            } catch (NumberFormatException e) {
+                document.setExpenseAmount(0);
+            }
+        }
+
         try {
-        	// 결재선 정보 배열 처리 (뷰에서 HTML 배열 형태로 전송받아옴) 
-        	List<ApprovalLineVO> approvalLines = new ArrayList<>();
+            List<ApprovalLineVO> approvalLines = new ArrayList<>();
+            String[] approverIds = null;
+
+            // 자동결재 vs 수동결재 분기
+            if ("auto".equals(approvalType)) {
+                // 자동 결재선 계산
+                List<String> autoApprovers = approvalRuleService.getAutoApprovalLine(
+                    document.getExpenseAmount(), documentType, user.getDeptId());
+                
+                approverIds = autoApprovers.toArray(new String[0]);
+            } else {
+                // 수동 결재선 (기존 방식)
+                approverIds = request.getParameterValues("approverIds");
+            }
+
+            // 결재선 구성 (기존 로직 그대로)
             if (approverIds != null && approverIds.length > 0) {
                 for (int i = 0; i < approverIds.length; i++) {
                     ApprovalLineVO line = new ApprovalLineVO();
@@ -159,33 +185,86 @@ public class ApprovalController {
                     line.setApprovalType("APPROVAL");
                     approvalLines.add(line);
                 }
-            } else {
-            	System.out.println("결재선 데이터가 없습니다!");
             }
-            
+
             if (approvalLines.isEmpty()) {
                 model.addAttribute("error", "결재자를 최소 1명 이상 지정해주세요.");
                 List<LoginVO> deptUsers = approvalService.getUserListByDept(user.getDeptId());
                 model.addAttribute("deptUsers", deptUsers);
                 return "/approval/documentForm";
             }
-            
+
             // 문서와 결재선 함께 등록
             approvalService.insertDocumentWithApprovalLines(document, approvalLines);
-            //approvalService.insertDocument(document);
-
             model.addAttribute("success", "결재 문서가 성공적으로 등록되었습니다.");
             return "redirect:/dashboard.do";
+
         } catch (Exception e) {
-            model.addAttribute("error", "문서 등록 중 오류가 발생했습니다." + e.getMessage());
-            
-            // 같은 부서 사용자 목록 다시 조회
+            model.addAttribute("error", "문서 등록 중 오류가 발생했습니다: " + e.getMessage());
             List<LoginVO> deptUsers = approvalService.getUserListByDept(user.getDeptId());
             model.addAttribute("deptUsers", deptUsers);
-            
             return "/approval/documentForm";
         }
     }
+    
+//    @PostMapping("/document/submit.do")
+//    public String submitDocument(HttpServletRequest request, HttpSession session, Model model) throws Exception {
+//        LoginVO user = (LoginVO) session.getAttribute("user");
+//        if (user == null) {
+//            return "redirect:/login.do";
+//        }
+//        
+//        String title = request.getParameter("title");
+//        String content = request.getParameter("content");
+//        String documentType = request.getParameter("documentType");
+//        String[] approverIds = request.getParameterValues("approverIds");  //뷰에서 전송되는 데이터 배열로 받기 
+//        
+//        // 문서 정보 설정 
+//        ApprovalDocumentVO document = new ApprovalDocumentVO();
+//        document.setTitle(title);
+//        document.setContent(content);
+//        document.setDocumentType(documentType);
+//        document.setAuthorId(user.getUserId());
+//        document.setDeptId(user.getDeptId());
+//        
+//        try {
+//        	// 결재선 정보 배열 처리 (뷰에서 HTML 배열 형태로 전송받아옴) 
+//        	List<ApprovalLineVO> approvalLines = new ArrayList<>();
+//            if (approverIds != null && approverIds.length > 0) {
+//                for (int i = 0; i < approverIds.length; i++) {
+//                    ApprovalLineVO line = new ApprovalLineVO();
+//                    line.setApproverId(approverIds[i]);
+//                    line.setApprovalOrder(i + 1);
+//                    line.setApprovalType("APPROVAL");
+//                    approvalLines.add(line);
+//                }
+//            } else {
+//            	System.out.println("결재선 데이터가 없습니다!");
+//            }
+//            
+//            if (approvalLines.isEmpty()) {
+//                model.addAttribute("error", "결재자를 최소 1명 이상 지정해주세요.");
+//                List<LoginVO> deptUsers = approvalService.getUserListByDept(user.getDeptId());
+//                model.addAttribute("deptUsers", deptUsers);
+//                return "/approval/documentForm";
+//            }
+//            
+//            // 문서와 결재선 함께 등록
+//            approvalService.insertDocumentWithApprovalLines(document, approvalLines);
+//            //approvalService.insertDocument(document);
+//
+//            model.addAttribute("success", "결재 문서가 성공적으로 등록되었습니다.");
+//            return "redirect:/dashboard.do";
+//        } catch (Exception e) {
+//            model.addAttribute("error", "문서 등록 중 오류가 발생했습니다." + e.getMessage());
+//            
+//            // 같은 부서 사용자 목록 다시 조회
+//            List<LoginVO> deptUsers = approvalService.getUserListByDept(user.getDeptId());
+//            model.addAttribute("deptUsers", deptUsers);
+//            
+//            return "/approval/documentForm";
+//        }
+//    }
     
     /**
      * 문서 상세 조회 (결재 처리 화면)

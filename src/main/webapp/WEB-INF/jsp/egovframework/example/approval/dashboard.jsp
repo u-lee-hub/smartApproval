@@ -345,6 +345,7 @@
     </div>
 
     <!-- 메뉴 카드들 -->
+    <!-- 
     <div class="row mt-4 equal-height">
         <div class="col-md-4">
             <div class="card h-100">
@@ -395,6 +396,7 @@
             </div>
         </div>
     </div>
+ 	-->
 </main>
 
 	<%@ include file="../frame/footer.jsp"%>

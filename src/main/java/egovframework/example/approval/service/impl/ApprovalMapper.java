@@ -225,4 +225,5 @@ public interface ApprovalMapper {
             + "ORDER BY created_at DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApprovalDocumentVO> selectDocumentListByAuthorWithPaging(
         @Param("authorId") String authorId, @Param("offset") int offset, @Param("pageSize") int pageSize) throws Exception;
+    
 }

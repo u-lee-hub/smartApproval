@@ -62,5 +62,5 @@ public interface ApprovalService {
     
     // 내가 작성한 문서 목록 (페이징)
     List<ApprovalDocumentVO> getDocumentListByAuthorWithPaging(String authorId, int offset, int pageSize) throws Exception;
-    
+
 }
