@@ -23,8 +23,8 @@ public interface ApprovalMapper {
 	 * @param document
 	 * @throws Exception
 	 */
-	@Insert("INSERT INTO DOCUMENTS (title, content, document_type, author_id, dept_id, status) "
-			+ "VALUES (#{title}, #{content}, #{documentType}, #{authorId}, #{deptId}, #{status})")
+	@Insert("INSERT INTO DOCUMENTS (title, content, document_type, author_id, dept_id, status, expense_amount) "
+			+ "VALUES (#{title}, #{content}, #{documentType}, #{authorId}, #{deptId}, #{status}, #{expenseAmount})")
 	@Options(useGeneratedKeys = true, keyProperty = "documentId") //자동생성된 키값 가져오기(방금 생성된 문서의 ID가 필요) 
 	void insertDocument(ApprovalDocumentVO document) throws Exception;
     

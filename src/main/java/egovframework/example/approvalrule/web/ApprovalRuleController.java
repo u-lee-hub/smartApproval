@@ -35,7 +35,7 @@ public class ApprovalRuleController {
             return "redirect:/login.do";
         }
 
-        // 관리자 권한 체크 (선택사항)
+        // 관리자 권한 체크 
         // if (!"ADMIN".equals(user.getRoleId())) {
         //     model.addAttribute("error", "관리자 권한이 필요합니다.");
         //     return "redirect:/dashboard.do";

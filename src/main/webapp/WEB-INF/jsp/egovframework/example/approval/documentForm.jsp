@@ -18,187 +18,76 @@
 <body>
 <%@ include file="../frame/header.jsp"%>
 <%-- 메인 컨텐츠 --%>
-<main class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <h2 class="mb-4">결재 문서 작성</h2>
-            <form id="documentForm" method="post" action="${pageContext.request.contextPath}/document/submit.do">
-                
-                <!-- 문서 기본 정보 -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">문서 정보</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="documentType" class="form-label">문서 타입</label>
-                            <select class="form-select" id="documentType" name="documentType" required>
-                                <option value="">문서 타입을 선택하세요</option>
-                                <option value="출장비신청서">출장비신청서</option>
-                                <option value="휴가신청서">휴가신청서</option>
-                                <option value="구매요청서">구매요청서</option>
-                                <option value="교육신청서">교육신청서</option>
-                                <option value="기타">기타</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="title" class="form-label">제목</label>
-                            <input type="text" class="form-control" id="title" name="title" maxlength="255" required />
-                        </div>
-                        <div class="mb-3">
-                            <label for="content" class="form-label">내용</label>
-                            <textarea class="form-control" id="content" name="content" rows="8" required></textarea>
-                        </div>
-                    </div>
+	<main class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-md-10">
+				<h2 class="mb-4">결재 문서 작성</h2>
+				<form id="documentForm" method="post"
+					action="${pageContext.request.contextPath}/document/submit.do">
 
-						<!-- ⭐ 지출금액 필드 추가 -->
-						<div class="form-group">
-							<label for="expenseAmount">지출금액 (원):</label> <input type="number"
-								id="expenseAmount" name="expenseAmount" min="0" max="99999999"
-								placeholder="지출금액을 입력하세요" onchange="previewAutoApproval()">
+					<!-- 문서 기본 정보 -->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h5 class="mb-0">문서 정보</h5>
 						</div>
+						<div class="card-body">
+							<div class="mb-3">
+								<label for="documentType" class="form-label">문서 타입</label> <select
+									class="form-select" id="documentType" name="documentType"
+									required>
+									<option value="">문서 타입을 선택하세요</option>
+									<option value="일반구매신청서">일반구매신청서</option>
+									<option value="장비구매신청서">장비구매신청서</option>
+									<option value="교육비신청서">교육비신청서</option>
+									<option value="회식비신청서">회식비신청서</option>
+									<option value="기타">기타</option>
+								</select>
+							</div>
+							<div class="mb-3">
+								<label for="title" class="form-label">제목</label> <input
+									type="text" class="form-control" id="title" name="title"
+									maxlength="255" required />
+							</div>
+							<div class="mb-3">
+								<label for="content" class="form-label">내용</label>
+								<textarea class="form-control" id="content" name="content"
+									rows="8" required></textarea>
+							</div>
 
-
+							<!-- 지출금액 필드 -->
+							<div class="form-group">
+								<label for="expenseAmount">지출금액 :</label> <input type="number"
+									id="expenseAmount" name="expenseAmount" min="0" max="99999999"
+									placeholder="(원)" onchange="previewAutoApproval()">
+							</div>
+						</div>
 					</div>
 
-<!-- -------------------------------------------------------------------------------------- -->
-<!-- ⭐ 결재선 선택 방식 추가 -->
-    <div class="form-group">
-        <label>결재선 선택:</label>
-        <div>
-            <input type="radio" id="autoApproval" name="approvalType" value="auto" 
-                   onchange="toggleApprovalType()" checked>
-            <label for="autoApproval">자동 결재선</label>
-            
-            <input type="radio" id="manualApproval" name="approvalType" value="manual" 
-                   onchange="toggleApprovalType()">
-            <label for="manualApproval">수동 결재선</label>
-        </div>
-    </div>
-
-    <!-- ⭐ 자동 결재선 미리보기 -->
-    <div id="autoApprovalPreview" class="form-group">
-        <label>예상 결재선:</label>
-        <div id="previewResult" style="padding: 10px; background-color: #f5f5f5; border-radius: 5px;">
-            금액을 입력하면 자동으로 결재선이 표시됩니다.
-        </div>
-    </div>
-
-    <!-- 기존 수동 결재선 선택 (숨김 처리) -->
-    <div id="manualApprovalSection" class="form-group" style="display: none;">
-        <label for="approvers">결재자 선택:</label>
-        <select name="approverIds" multiple size="5">
-            <c:forEach var="user" items="${deptUsers}">
-                <option value="${user.userId}">${user.userName} (${user.roleId})</option>
-            </c:forEach>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <input type="submit" value="문서 등록" class="btn btn-primary">
-        <a href="/dashboard.do" class="btn btn-secondary">취소</a>
-    </div>
-
-
-
-
-
-
-
-
-	
-
 					<!-- 결재선 지정 -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">결재선 지정</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="approverSelect" class="form-label">결재자 선택</label>
-                            <select class="form-select" id="approverSelect">
-                                <option value="">결재자를 선택하세요</option>
-                                <c:forEach var="user" items="${deptUsers}">
-                                    <option value="${user.userId}" data-name="${user.userName}">${user.userName} (${user.userId})</option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <button type="button" class="btn btn-outline-primary mb-3" onclick="addApprover()">
-                            ➕ 결재자 추가
-                        </button>
-                        
-                        <!-- 결재선 목록 -->
-                        <div id="approvalLineList">
-                            <h6>결재 순서</h6>
-                            <div class="list-group" id="approverList">
-                                <div class="text-muted text-center p-3" id="emptyMessage">
-                                    결재자를 추가해주세요.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+					<div class="card mb-4">
+						<div class="card-header">
+							<h5 class="mb-0">결재선 지정</h5>
+						</div>
+						<div class="card-body">
 
-                <!-- HTML 배열 형태로 결재선 데이터 전송 -->
-                <div id="approvalInputs"></div>
-
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button type="submit" class="btn btn-primary btn-lg">문서 등록</button>
-                    <a href="${pageContext.request.contextPath}/dashboard.do" class="btn btn-secondary btn-lg">❌ 취소</a>
-                </div>
-                
-            </form>
-
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger mt-3">${error}</div>
-            </c:if>
-        </div>
-    </div>
-</main>
-
-<script>
-
-function toggleApprovalType() {
-    const autoApproval = document.getElementById('autoApproval').checked;
-    const autoPreview = document.getElementById('autoApprovalPreview');
-    const manualSection = document.getElementById('manualApprovalSection');
-    
-    if (autoApproval) {
-        autoPreview.style.display = 'block';
-        manualSection.style.display = 'none';
-        previewAutoApproval();
-    } else {
-        autoPreview.style.display = 'none';
-        manualSection.style.display = 'block';
-    }
-}
-
-function previewAutoApproval() {
-    const amount = document.getElementById('expenseAmount').value;
-    const documentType = document.querySelector('select[name="documentType"]').value;
-    
-    if (!amount || amount == 0) {
-        document.getElementById('previewResult').innerHTML = '금액을 입력하면 자동으로 결재선이 표시됩니다.';
-        return;
-    }
-
-    let previewText = '';
-    if (amount < 100000) {
-        previewText = '팀장만 (1단계)';
-    } else if (amount < 500000) {
-        previewText = '팀장 → 부서장 (2단계)';
-    } else {
-        previewText = '팀장 → 부서장 → 대표 (3단계)';
-    }
-    
-    document.getElementById('previewResult').innerHTML = 
-        `<strong>${amount.toLocaleString()}원</strong> → ${previewText}`;
-}
-
-// 페이지 로드시 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    toggleApprovalType();
-});
+							<!-- 자동/수동 선택 -->
+							<div class="mb-3">
+								<label class="form-label">결재선 선택 방식</label>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" id="autoApproval"
+										name="approvalType" value="auto"
+										onchange="toggleApprovalType()" checked> <label
+										class="form-check-label" for="autoApproval"> 🤖 자동 결재선
+										(금액 기반) </label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio"
+										id="manualApproval" name="approvalType" value="manual"
+										onchange="toggleApprovalType()"> <label
+										class="form-check-label" for="manualApproval"> 👤 수동
+										결재선 (직접 선택) </label>
+								</div>
+							</div>
 
 
 
@@ -206,30 +95,63 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+							<!-- 자동 결재선 미리보기 -->
+							<div id="autoApprovalPreview" class="mb-3">
+								<label class="form-label">예상 결재선</label>
+								<div id="previewResult" class="alert alert-info">지출금액을
+									입력하면 자동으로 결재선이 표시됩니다.</div>
+							</div>
 
+							<!-- 수동 결재선 섹션 -->
+							<div id="manualApprovalSection" style="display: none;">
+								<div class="mb-3">
+									<label for="approverSelect" class="form-label">결재자 선택</label> <select
+										class="form-select" id="approverSelect">
+										<option value="">결재자를 선택하세요</option>
+										<c:forEach var="user" items="${deptUsers}">
+											<option value="${user.userId}" data-name="${user.userName}">${user.userName}
+												(${user.userId})</option>
+										</c:forEach>
+									</select>
+								</div>
+								<button type="button" class="btn btn-outline-primary mb-3"
+									onclick="addApprover()">➕ 결재자 추가</button>
 
+								<!-- 결재선 목록 -->
+								<div id="approvalLineList">
+									<h6>결재 순서</h6>
+									<div class="list-group" id="approverList">
+										<div class="text-muted text-center p-3" id="emptyMessage">
+											결재자를 추가해주세요.</div>
+									</div>
+								</div>
+							</div>
 
+						</div>
+					</div>
 
+					<!-- HTML 배열 형태로 결재선 데이터 전송 -->
+					<div id="approvalInputs"></div>
 
+					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+						<button type="submit" class="btn btn-primary btn-lg">문서
+							등록</button>
+						<a href="${pageContext.request.contextPath}/dashboard.do"
+							class="btn btn-secondary btn-lg">❌ 취소</a>
+					</div>
 
+				</form>
 
+				<c:if test="${not empty error}">
+					<div class="alert alert-danger mt-3">${error}</div>
+				</c:if>
+			</div>
+		</div>
+	</main>
 
+	<script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// 수동 결재 지정 ///////////////////////////////////////////////////////////
 let approvalLineData = [];
 
 // 결재자 추가
@@ -320,18 +242,72 @@ function updateApproverList() {
     }
 }
 
-// 폼 제출 전 검증
+
+//자동 결재 라인 ///////////////////////////////////////////////////////////
+// 결재선 전환 (자동 or 수동)
+function toggleApprovalType() {
+    const autoApproval = document.getElementById('autoApproval').checked;
+    const autoPreview = document.getElementById('autoApprovalPreview');
+    const manualSection = document.getElementById('manualApprovalSection');
+    
+    if (autoApproval) {
+        autoPreview.style.display = 'block';
+        manualSection.style.display = 'none';
+        previewAutoApproval();
+    } else {
+        autoPreview.style.display = 'none';
+        manualSection.style.display = 'block';
+    }
+}
+
+// 자동 결재선 미리보기 
+function previewAutoApproval() {
+    const amount = document.getElementById('expenseAmount').value;
+    const documentType = document.querySelector('select[name="documentType"]').value;
+    
+    if (!amount || amount == 0) {
+        document.getElementById('previewResult').innerHTML = '금액을 입력하면 자동으로 결재선이 표시됩니다.';
+        return;
+    }
+
+    let previewText = '';
+    if (amount < 100000) {
+        previewText = '팀장만 (1단계)';
+    } else if (amount < 500000) {
+        previewText = '팀장 → 부서장 (2단계)';
+    } else {
+        previewText = '팀장 → 부서장 → 대표 (3단계)';
+    }
+    
+    document.getElementById('previewResult').innerHTML = 
+        `<strong>${parseInt(amount).toLocaleString()}원</strong> → ${previewText}`;
+}
+
+// 폼 제출 전 검증 
 document.getElementById('documentForm').addEventListener('submit', function(e) {
-    if (approvalLineData.length === 0) {
+	const approvalType = document.querySelector('input[name="approvalType"]:checked').value;
+	
+	if (approvalType === 'manual' && approvalLineData.length === 0) {
         e.preventDefault();
-        alert('결재자를 최소 1명 이상 지정해주세요.');
+        alert('수동 결재선을 선택했습니다. 결재자를 최소 1명 이상 지정해주세요.');
         return false;
+    }
+    
+    if (approvalType === 'auto') {
+        const amount = document.getElementById('expenseAmount').value;
+        if (!amount || amount == 0) {
+            e.preventDefault();
+            alert('자동 결재선을 선택했습니다. 지출금액을 입력해주세요.');
+            return false;
+        }
     }
 });
 
-// 초기 상태 설정
+
+// 페이지 로드시 초기화
 document.addEventListener('DOMContentLoaded', function() {
     updateApproverList();
+    toggleApprovalType(); // 자동결재 초기화
 });
 
 </script>
