@@ -55,10 +55,15 @@
 							</div>
 
 							<!-- 지출금액 필드 -->
-							<div class="form-group">
-								<label for="expenseAmount">지출금액 :</label> <input type="number"
-									id="expenseAmount" name="expenseAmount" min="0" max="99999999"
-									placeholder="(원)" onchange="previewAutoApproval()">
+							<div class="mb-3">
+								<label for="expenseAmount" class="form-label">지출금액</label>
+								<div class="input-group">
+									<input type="number" class="form-control" id="expenseAmount"
+										name="expenseAmount" min="0" max="99999999"
+										placeholder="금액을 입력하세요" onchange="previewAutoApproval()">
+									<span class="input-group-text">원</span>
+								</div>
+								<div class="form-text">자동 결재선 계산을 위해 지출금액을 입력해주세요.</div>
 							</div>
 						</div>
 					</div>
@@ -77,22 +82,17 @@
 									<input class="form-check-input" type="radio" id="autoApproval"
 										name="approvalType" value="auto"
 										onchange="toggleApprovalType()" checked> <label
-										class="form-check-label" for="autoApproval"> 🤖 자동 결재선
+										class="form-check-label" for="autoApproval"> 자동 결재선
 										(금액 기반) </label>
 								</div>
 								<div class="form-check">
 									<input class="form-check-input" type="radio"
 										id="manualApproval" name="approvalType" value="manual"
 										onchange="toggleApprovalType()"> <label
-										class="form-check-label" for="manualApproval"> 👤 수동
+										class="form-check-label" for="manualApproval"> 수동
 										결재선 (직접 선택) </label>
 								</div>
 							</div>
-
-
-
-
-
 
 
 							<!-- 자동 결재선 미리보기 -->
@@ -280,7 +280,7 @@ function previewAutoApproval() {
     }
     
     document.getElementById('previewResult').innerHTML = 
-        `<strong>${parseInt(amount).toLocaleString()}원</strong> → ${previewText}`;
+    	'<strong>' + parseInt(amount).toLocaleString() + '원</strong> → ' + previewText;
 }
 
 // 폼 제출 전 검증 

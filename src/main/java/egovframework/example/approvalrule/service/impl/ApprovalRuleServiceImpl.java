@@ -137,7 +137,7 @@ public class ApprovalRuleServiceImpl extends EgovAbstractServiceImpl implements 
     }
     
     /**
-     * 규칙 유효성 검증 (대폭 간소화)
+     * 규칙 유효성 검증 
      */
     @Override
     public String validateRule(ApprovalRuleVO rule) throws Exception {
