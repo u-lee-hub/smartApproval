@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,7 +24,7 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <h2 class="mb-4">📄 결재 문서 상세</h2>
+            <h2 class="mb-4">결재 문서 상세</h2>
             
             <!-- 성공/에러 메시지 -->
             <c:if test="${not empty success}">
@@ -57,6 +58,8 @@
                             <td>${document.createdAt}</td>
                         </tr>
                         <tr>
+                        	<th style="background-color: #f8f9fa;">지출금액</th>
+                        	<td><fmt:formatNumber value="${document.expenseAmount}" pattern="#,###"/>원</td>
                             <th style="background-color: #f8f9fa;">결재 상태</th>
                             <td colspan="3">
                                 <c:choose>

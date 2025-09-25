@@ -48,7 +48,7 @@ public interface ApprovalMapper {
      * @throws Exception
      */
     @Select("SELECT document_id AS documentId, title, content, document_type AS documentType, "
-    		+ "author_id AS authorId, dept_id AS deptId, status, "
+    		+ "author_id AS authorId, dept_id AS deptId, status, expense_amount AS expenseAmount, "
     		+ "created_at AS createdAt, updated_at AS updatedAt "
     		+ "FROM DOCUMENTS "
     		+ "WHERE document_id = #{documentId}")

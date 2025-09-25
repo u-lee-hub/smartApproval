@@ -94,7 +94,6 @@
 								</div>
 							</div>
 
-
 							<!-- 자동 결재선 미리보기 -->
 							<div id="autoApprovalPreview" class="mb-3">
 								<label class="form-label">예상 결재선</label>
